@@ -21,10 +21,14 @@ Ubuntu 14.04
     <td>URL</td>
     <td>Source repository for InspIRCd</td>
     <td><tt>https://github.com/inspircd/inspircd.git</tt></td>
+  </tr>
+  <tr>
     <td><tt>['snoonet']['inspircd']['srcdir']</tt></td>
     <td>String</td>
     <td>Directory to be used for InspIRCd source repo</td>
     <td><tt>/home/snoonet/src/inspircd</tt></td>
+  </tr>
+  <tr>
     <td><tt>['snoonet']['inspircd']['deploydir']</tt></td>
     <td>String</td>
     <td>Directory to be used for InspIRCd deployment</td>
