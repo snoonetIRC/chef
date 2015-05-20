@@ -32,7 +32,7 @@ Ubuntu 14.04
     <td><tt>['snoonet']['inspircd']['deploydir']</tt></td>
     <td>String</td>
     <td>Directory to be used for InspIRCd deployment</td>
-    <td><tt>/home/snoonet/isnpircd</tt></td>
+    <td><tt>/home/snoonet/inspircd</tt></td>
   </tr>
 </table>
 
