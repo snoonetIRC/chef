@@ -5,6 +5,7 @@
 # Copyright (C) 2015 SnooNet
 #
 # Update apt-get because sometimes it behaves poorly
+
 execute "apt-get update" do
     command "apt-get update"
 end
@@ -24,7 +25,7 @@ packages.each { |pkg|
 }
 
 # Ensure the default snoonet user exists
-user default['snoonet']['user'] do
+user node['snoonet']['user'] do
     action :create
 end
 
@@ -32,11 +33,12 @@ end
 directories = %W(
     #{node['snoonet']['inspircd']['srcdir']}
     #{node['snoonet']['inspircd']['deploydir']}
+    #{node['snoonet']['config']['srcdir']}
 )
 directories.each { |dir|
     directory dir do
-        owner default['snoonet']['user']
-        group default['snoonet']['group']
+        owner node['snoonet']['user']
+        group node['snoonet']['group']
         action :create
         recursive true
     end
@@ -44,33 +46,55 @@ directories.each { |dir|
 
 # Sync the repo with git
 git node['snoonet']['inspircd']['srcdir'] do
-    user default['snoonet']['user']
-    group default['snoonet']['group']
+    user node['snoonet']['user']
+    group node['snoonet']['group']
     repository node['snoonet']['inspircd']['repo']
     action :sync
+    notifies :run, 'execute[Run configure]', :immediately
+    notifies :run, 'execute[Compile InspIRCd]', :immediately
+    notifies :run, 'execute[Install InspIRCd]', :immediately
 end
 
 execute "Run configure" do
     cwd node['snoonet']['inspircd']['srcdir']
-    user default['snoonet']['user']
-    group default['snoonet']['group']
+    user node['snoonet']['user']
+    group node['snoonet']['group']
     command "./configure --prefix=#{node['snoonet']['inspircd']['deploydir']} --development"
-    action :run
+    action :nothing
 end
 
 execute "Compile InspIRCd" do
     cwd node['snoonet']['inspircd']['srcdir']
-    user default['snoonet']['user']
-    group default['snoonet']['group']
+    user node['snoonet']['user']
+    group node['snoonet']['group']
     # Have to include cd because of PWD wonkyness
     command "cd #{node['snoonet']['inspircd']['srcdir']} && make -j1"
-    action :run
+    action :nothing
 end
 
 execute "Install InspIRCd" do
     cwd node['snoonet']['inspircd']['srcdir']
-    user default['snoonet']['user']
-    group default['snoonet']['group']
+    user node['snoonet']['user']
+    group node['snoonet']['group']
     command "cd #{node['snoonet']['inspircd']['srcdir']} && make install"
-    action :run
+    action :nothing
+end
+
+file '/etc/init/snoonet-inspircd.conf' do
+    content <<-FILE
+description "Snoonet's InspIRCd Daemon"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+setuid snoonet
+setgid snoonet
+
+exec #{node['snoonet']['inspircd']['deploydir']}/bin/inspircd --config=#{node['snoonet']['config']['deploylink']}/inspircd.conf
+    FILE
+    action :create
+end
+
+service 'snoonet-inspircd' do
+    action [ :enable, :start ]
 end

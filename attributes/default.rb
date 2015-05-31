@@ -10,3 +10,6 @@ default['snoonet']['inspircd']['repo'] = 'https://github.com/inspircd/inspircd.g
 default['snoonet']['inspircd']['srcdir'] = '/home/snoonet/src/inspircd'
 default['snoonet']['inspircd']['deploydir'] = '/home/snoonet/inspircd'
 
+# Local config dir
+default['snoonet']['config']['srcdir'] = '/home/snoonet/src/inspconf'
+default['snoonet']['config']['deploylink'] = "#{node['snoonet']['inspircd']['deploydir']}/conf"
