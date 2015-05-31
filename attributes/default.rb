@@ -1,4 +1,8 @@
 
+# Snoonet user information
+default['snoonet']['user'] = 'snoonet'
+default['snoonet']['group'] = 'snoonet'
+
 # Set the repo location
 default['snoonet']['inspircd']['repo'] = 'https://github.com/inspircd/inspircd.git'
 

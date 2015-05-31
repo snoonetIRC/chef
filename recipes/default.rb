@@ -23,7 +23,8 @@ packages.each { |pkg|
     end
 }
 
-user 'snoonet' do
+# Ensure the default snoonet user exists
+user default['snoonet']['user'] do
     action :create
 end
 
@@ -34,8 +35,8 @@ directories = %W(
 )
 directories.each { |dir|
     directory dir do
-        owner 'snoonet'
-        group 'snoonet'
+        owner default['snoonet']['user']
+        group default['snoonet']['group']
         action :create
         recursive true
     end
@@ -43,24 +44,24 @@ directories.each { |dir|
 
 # Sync the repo with git
 git node['snoonet']['inspircd']['srcdir'] do
-    user 'snoonet'
-    group 'snoonet'
+    user default['snoonet']['user']
+    group default['snoonet']['group']
     repository node['snoonet']['inspircd']['repo']
     action :sync
 end
 
 execute "Run configure" do
     cwd node['snoonet']['inspircd']['srcdir']
-    user 'snoonet'
-    group 'snoonet'
+    user default['snoonet']['user']
+    group default['snoonet']['group']
     command "./configure --prefix=#{node['snoonet']['inspircd']['deploydir']} --development"
     action :run
 end
 
 execute "Compile InspIRCd" do
     cwd node['snoonet']['inspircd']['srcdir']
-    user 'snoonet'
-    group 'snoonet'
+    user default['snoonet']['user']
+    group default['snoonet']['group']
     # Have to include cd because of PWD wonkyness
     command "cd #{node['snoonet']['inspircd']['srcdir']} && make -j1"
     action :run
@@ -68,8 +69,8 @@ end
 
 execute "Install InspIRCd" do
     cwd node['snoonet']['inspircd']['srcdir']
-    user 'snoonet'
-    group 'snoonet'
+    user default['snoonet']['user']
+    group default['snoonet']['group']
     command "cd #{node['snoonet']['inspircd']['srcdir']} && make install"
     action :run
 end
