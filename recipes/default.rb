@@ -39,7 +39,7 @@ if ENV['USER'] == 'root'
     inspircdrestart = [:restart, 'service[snoonet-inspircd]', :immediately]
 else
     inspircdstop = [:run, 'execute[Stop InspIRCd]', :immediately]
-    inspircdrestart = [:run, 'execute[Restart InspIRCd', :immediately]
+    inspircdrestart = [:run, 'execute[Restart InspIRCd]', :immediately]
 end
 
 # Create the directories the repo and deploy will live in
