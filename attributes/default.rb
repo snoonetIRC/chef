@@ -1,15 +1,16 @@
-
 # Snoonet user information
 default['snoonet']['user'] = 'snoonet'
 default['snoonet']['group'] = 'snoonet'
+default['snoonet']['homedir'] = '/home/snoonet'
 
-# Set the repo location
-default['snoonet']['inspircd']['repo'] = 'https://github.com/inspircd/inspircd.git'
+# Directories
+default['snoonet']['dirs']['deploy'] = "#{node['snoonet']['homedir']}/inspircd"
+default['snoonet']['dirs']['srcroot'] = "#{node['snoonet']['homedir']}/src"
+default['snoonet']['dirs']['repo'] = "#{node['snoonet']['dirs']['srcroot']}/inspircd"
+default['snoonet']['dirs']['confrepo'] = "#{node['snoonet']['dirs']['srcroot']}/inspconf"
 
 # Local source dir
-default['snoonet']['inspircd']['srcdir'] = '/home/snoonet/src/inspircd'
-default['snoonet']['inspircd']['deploydir'] = '/home/snoonet/inspircd'
+default['snoonet']['inspircd']['repo'] = 'https://github.com/inspircd/inspircd.git'
 
-# Local config dir
-default['snoonet']['config']['srcdir'] = '/home/snoonet/src/inspconf'
-default['snoonet']['config']['deploylink'] = "#{node['snoonet']['inspircd']['deploydir']}/conf"
+# Local config info
+default['snoonet']['config']['repo'] = 'snoonet@con.cosmos.snoonet.org:~/git/inspconf'
