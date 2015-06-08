@@ -13,4 +13,4 @@ suites:
   - name: default
     run_list:
         - recipe[snoonet-deploy::default]
-    attributes:
+    attributes: { snoonet: { config: { repo: 'test' } } }

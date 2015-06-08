@@ -79,15 +79,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision :chef_solo do |chef|
     chef.json = {
-      mysql: {
-        server_root_password: 'rootpass',
-        server_debian_password: 'debpass',
-        server_repl_password: 'replpass'
+      snoonet: {
+          config: {
+              repo: 'test'
+          }
       }
     }
 
     chef.run_list = [
-
       'recipe[snoonet-deploy::default]'
     ]
   end
