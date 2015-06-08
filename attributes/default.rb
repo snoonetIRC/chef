@@ -14,3 +14,8 @@ default['snoonet']['inspircd']['repo'] = 'https://github.com/inspircd/inspircd.g
 
 # Local config info
 default['snoonet']['config']['repo'] = 'snoonet@con.cosmos.snoonet.org:~/git/inspconf'
+
+# Recipe action gates
+default['snoonet']['action']['update'] = true
+default['snoonet']['action']['build'] = true
+default['snoonet']['action']['install'] = true
