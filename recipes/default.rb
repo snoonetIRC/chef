@@ -7,32 +7,8 @@
 
 # We can only install packages and create users if we're root
 if ENV['USER'] == 'root'
-    # Update apt-get because sometimes it behaves poorly
-
-    execute "apt-get update" do
-        command "apt-get update"
-    end
-
-    # Install packages
-    packages = %w(
-        git
-        clang
-        pkg-config
-        libssl-dev
-    )
-
-    packages.each { |pkg|
-        package pkg do
-            action :install
-        end
-    }
-
-    # Ensure the default snoonet user exists
-    user node['snoonet']['user'] do
-        supports :manage_home => true
-        home node['snoonet']['homedir']
-        action :create
-    end
+    # If we're root, setup the environment
+    include_recipe "#{cookbook_name}::environment"
 
     # Define parameters
     inspircdstop = [:stop, 'service[snoonet-inspircd]', :immediately]
@@ -85,15 +61,24 @@ link "#{node['snoonet']['dirs']['deploy']}/conf" do
     to node['snoonet']['dirs']['confrepo']
 end
 
-=begin
-git node['snoonet']['config']['srcdir'] do
-    user node['snoonet']['user']
-    group node['snoonet']['group']
-    repository node['snoonet']['config']['repo']
-    action :sync
-    notifies :restart, 'service[snoonet-inspircd]', :immediately
+# Create a dummy conf for testing if our repo location is 'test' instead of
+# a proper URL
+if node['snoonet']['config']['repo'] == 'test'
+    file "#{node['snoonet']['dirs']['confrepo']}/inspircd.conf" do
+        content <<-CONF
+Dummy Config
+        CONF
+        action :create
+    end
+else
+    git node['snoonet']['dirs']['confrepo'] do
+        user node['snoonet']['user']
+        group node['snoonet']['group']
+        repository node['snoonet']['config']['repo']
+        action :sync
+        notifies :restart, 'service[snoonet-inspircd]', :immediately
+    end
 end
-=end
 
 execute "Configure InspIRCd" do
     cwd node['snoonet']['dirs']['repo']
@@ -138,22 +123,6 @@ end
 
 # We can only create and manage services if we're root
 if ENV['USER'] == 'root'
-    file '/etc/init/snoonet-inspircd.conf' do
-        content <<-FILE
-    description "Snoonet's InspIRCd Daemon"
-
-    start on runlevel [2345]
-    stop on runlevel [!2345]
-
-    setuid snoonet
-    setgid snoonet
-
-    exec #{node['snoonet']['dirs']['deploy']}/bin/inspircd --config=#{node['snoonet']['dirs']['deploy']}/conf/inspircd.conf
-        FILE
-        action :create
-    end
-
-    service 'snoonet-inspircd' do
-        action [ :enable, :start ]
-    end
+    # Setup the InspIRCd Service
+    include_recipe "#{cookbook_name}::service"
 end
